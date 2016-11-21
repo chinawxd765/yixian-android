@@ -52,7 +52,7 @@ public class FindUserListFragment extends Fragment {
     private int firstVisibleItemTop = 0;    // 屏幕可见首个显示项目与顶部的偏移
     private int lastVisibleItemPosition;    // 屏幕可见最后一个显示项目的序列号
 
-    private int pageNo = 0;  // 当前页码
+    private int pageNo = 0;  // 当前页码toto
     private HashMap<String, Bitmap> headImageMap = new HashMap<>();  // 已加载的头像列表
 
     private SwipeRefreshLayout swipeRefreshLayout;
