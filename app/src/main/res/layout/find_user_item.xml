@@ -12,59 +12,130 @@
     <ImageView
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:id="@+id/headImageSrc"
+        android:id="@+id/headImage"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"
-        android:contentDescription="@string/user_img_description"
+        android:contentDescription="@string/user_head_image_description"
         android:src="@drawable/default_head_image"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="孙悟空"
+        android:text="@string/user_nick_name"
         android:id="@+id/nickName"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/headImageSrc"
-        android:layout_toEndOf="@+id/headImageSrc"
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
         android:textSize="16sp"
         android:textColor="@android:color/black"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="男"
-        android:id="@+id/sex"
+    <ImageView
+        android:id="@+id/sexIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_below="@+id/nickName"
-        android:layout_toRightOf="@+id/headImageSrc"
-        android:layout_toEndOf="@+id/headImageSrc"
-        android:fontFamily="sans-serif"
-        android:textSize="14sp" />
+        android:contentDescription="@string/user_sex_icon_description"
+        android:src="@drawable/icon_boy"
+        android:layout_toRightOf="@+id/headImage" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="花果山水帘洞美猴王齐天大圣孙悟空"
+        android:text="@string/user_mood"
         android:id="@+id/mood"
-        android:layout_below="@+id/sex"
-        android:layout_toRightOf="@+id/headImageSrc"
-        android:layout_toEndOf="@+id/headImageSrc"
-        android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif"
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        android:layout_below="@+id/sexIcon"
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage" />
 
     <!-- 分隔线 -->
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/mood"
-        android:layout_toRightOf="@+id/headImageSrc"
-        android:layout_toEndOf="@+id/headImageSrc"
-        android:background="@color/colorItemDividers"/>
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorItemDividers"
+        android:contentDescription="@string/dividers_description"/>
 
 </RelativeLayout>
+
+
+<!--
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/headImage"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:contentDescription="@string/user_head_image_description"
+        android:src="@drawable/default_head_image"/>
+
+    <TextView
+        android:id="@+id/nickName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/user_nick_name"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"/>
+
+    <ImageView
+        android:id="@+id/sexIcon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_below="@+id/nickName"
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage"
+        android:contentDescription="@string/user_sex_icon_description"
+        android:layout_above="@+id/mood" />
+
+    <TextView
+        android:id="@+id/mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/user_mood"
+        android:layout_below="@+id/sexIcon"
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif"
+        android:textSize="14sp"/>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/mood"
+        android:layout_toRightOf="@+id/headImage"
+        android:layout_toEndOf="@+id/headImage"
+        android:background="@color/colorItemDividers"
+        android:contentDescription="@string/dividers_description"/>
+
+</RelativeLayout>
+-->

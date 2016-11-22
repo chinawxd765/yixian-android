@@ -1,7 +1,9 @@
 package com.chuxin.yixian;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -62,6 +64,12 @@ public class FindUserListFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
 
     /**
+     * 男女性别图标
+     */
+    private Bitmap boyIcon;
+    private Bitmap girlIcon;
+
+    /**
      * 创建新实例
      * @return FindUserListFragment实例
      */
@@ -76,6 +84,10 @@ public class FindUserListFragment extends Fragment {
 
         NoHttp.initialize(this.getActivity().getApplication());
         requestQueue = NoHttp.newRequestQueue();
+
+        Resources res = getResources();
+        boyIcon = BitmapFactory.decodeResource(res, R.drawable.icon_boy);
+        girlIcon = BitmapFactory.decodeResource(res, R.drawable.icon_girl);
     }
 
     @Override
@@ -344,8 +356,14 @@ public class FindUserListFragment extends Fragment {
                 userViewHolder.user = user;
 
                 userViewHolder.nickNameView.setText(user.getNickName());
-                userViewHolder.sexView.setText(user.getSex());
                 userViewHolder.moodView.setText(user.getMood());
+
+                // 设置性别图标
+                if ("BOY".equals(user.getSex())) {
+                    userViewHolder.sexIconView.setImageBitmap(boyIcon);
+                } else {
+                    userViewHolder.sexIconView.setImageBitmap(girlIcon);
+                }
 
                 // 加载头像
                 final String headImageSrc = Constant.APP_SERVER_IP
@@ -458,16 +476,16 @@ public class FindUserListFragment extends Fragment {
             public final View view;
             public final ImageView headImageView;
             public final TextView nickNameView;
-            public final TextView sexView;
+            public final ImageView sexIconView;
             public final TextView moodView;
             public User user;
 
             public UserViewHolder(View view) {
                 super(view);
                 this.view = view;
-                this.headImageView = (ImageView) view.findViewById(R.id.headImageSrc);
+                this.headImageView = (ImageView) view.findViewById(R.id.headImage);
                 this.nickNameView = (TextView) view.findViewById(R.id.nickName);
-                this.sexView = (TextView) view.findViewById(R.id.sex);
+                this.sexIconView = (ImageView) view.findViewById(R.id.sexIcon);
                 this.moodView = (TextView) view.findViewById(R.id.mood);
             }
         }

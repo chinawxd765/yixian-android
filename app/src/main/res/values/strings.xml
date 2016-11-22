@@ -2,6 +2,10 @@
     <string name="app_name">一线</string>
     <string name="loading">Loading...</string>
     <string name="main_tab_img_description">Tab按钮图片</string>
-    <string name="user_img_description">用户图片</string>
+    <string name="user_nick_name">昵称</string>
+    <string name="user_mood">心情</string>
+    <string name="user_head_image_description">用户图片</string>
+    <string name="user_sex_icon_description">用户性别图标</string>
+    <string name="dividers_description">分隔线</string>
     <string name="action_settings">Settings</string>
 </resources>
