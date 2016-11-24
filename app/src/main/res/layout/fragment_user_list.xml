@@ -16,7 +16,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context=".FindUserListFragment"
-        tools:listitem="@layout/find_user_item" />
+        tools:context=".UserListFragment"
+        tools:listitem="@layout/user_list_item" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

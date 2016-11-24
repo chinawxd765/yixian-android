@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity
-        implements FindUserListFragment.OnListFragmentInteractionListener {
+        implements UserListFragment.OnListFragmentInteractionListener {
 
     /**
      * Tab标题数组
@@ -70,7 +70,7 @@ public class MainActivity extends BaseActivity
         fragmentList = new ArrayList<>();
         fragmentList.add(MainTabFragment.newInstance(0));
         fragmentList.add(MainTabFragment.newInstance(1));
-        fragmentList.add(FindUserListFragment.newInstance());
+        fragmentList.add(UserListFragment.newInstance());
         fragmentList.add(MainTabFragment.newInstance(3));
 
         fragmentAdapter = new FragmentAdapter(getSupportFragmentManager(), fragmentList, tabTitleList);

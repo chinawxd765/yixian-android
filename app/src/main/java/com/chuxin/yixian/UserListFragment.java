@@ -45,7 +45,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class FindUserListFragment extends Fragment {
+public class UserListFragment extends Fragment {
 
     private static final int WHAT_USER_LIST_ONLOAD = 0;  // 初次加载
     private static final int WHAT_USER_LIST_UP_LOADMORE = 1;  // 上拉刷新
@@ -76,8 +76,8 @@ public class FindUserListFragment extends Fragment {
      * 创建新实例
      * @return FindUserListFragment实例
      */
-    public static final FindUserListFragment newInstance() {
-        FindUserListFragment fragment = new FindUserListFragment();
+    public static final UserListFragment newInstance() {
+        UserListFragment fragment = new UserListFragment();
         return fragment;
     }
 
@@ -96,7 +96,7 @@ public class FindUserListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_find_user_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_list, container, false);
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.find_user_list_swipe_refresh_layout);
 //        swipeRefreshLayout.setProgressBackgroundColorSchemeColor(Color.BLUE);
@@ -341,10 +341,10 @@ public class FindUserListFragment extends Fragment {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
             if (viewType == USER_ITEM) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.find_user_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_item, parent, false);
                 return new UserViewHolder(view);
             } else if (viewType == USER_LOADING) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.find_user_loading, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_loading, parent, false);
                 return new LoadingViewHolder(view);
             }
             return null;
