@@ -10,7 +10,7 @@ public class User {
     private String nickName;  // 昵称
     private String sex;  // 性别
     private String headImageSrc;    // 头像
-    private String mood;  // 心情
+    private String sign;  // 签名
 
     private String age;  // 年龄
 
@@ -46,12 +46,12 @@ public class User {
         this.headImageSrc = headImageSrc;
     }
 
-    public String getMood() {
-        return mood;
+    public String getSign() {
+        return sign;
     }
 
-    public void setMood(String mood) {
-        this.mood = mood;
+    public void setSign(String mood) {
+        this.sign = mood;
     }
 
     public String getAge() {

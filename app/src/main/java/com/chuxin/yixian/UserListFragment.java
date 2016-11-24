@@ -355,12 +355,11 @@ public class UserListFragment extends Fragment {
 
             if (holder instanceof UserViewHolder) {
                 final UserViewHolder userViewHolder = (UserViewHolder) holder;
-
                 User user = userList.get(position);
                 userViewHolder.user = user;
 
                 userViewHolder.nickNameView.setText(user.getNickName());
-                userViewHolder.moodView.setText(user.getMood());
+                userViewHolder.signView.setText(user.getSign());
                 userViewHolder.ageView.setText(user.getAge());
 
                 // 设置性别图标
@@ -405,12 +404,6 @@ public class UserListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
-                        if (selectedView != null) {
-                            selectedView.setSelected(false);
-                        }
-                        v.setSelected(true);
-                        selectedView = v;
-
                         if (null != mListener) {
                             // Notify the active callbacks interface (the activity, if the
                             // fragment is attached to one) that an item has been selected.
@@ -441,7 +434,7 @@ public class UserListFragment extends Fragment {
                     user.setNickName(userJsonOnject.getString("nickName"));
                     user.setSex(userJsonOnject.getString("sex"));
                     user.setHeadImageSrc(userJsonOnject.getString("headImageSrc"));
-                    user.setMood(userJsonOnject.getString("mood"));
+                    user.setSign(userJsonOnject.getString("sign"));
 
                     if (userJsonOnject.getInt("age") > 0) {
                         user.setAge(userJsonOnject.getString("age"));
@@ -486,7 +479,7 @@ public class UserListFragment extends Fragment {
             public final ImageView headImageView;
             public final TextView nickNameView;
             public final ImageView sexIconView;
-            public final TextView moodView;
+            public final TextView signView;
             public final TextView ageView;
             public User user;
 
@@ -496,7 +489,7 @@ public class UserListFragment extends Fragment {
                 this.headImageView = (ImageView) view.findViewById(R.id.headImage);
                 this.nickNameView = (TextView) view.findViewById(R.id.nickName);
                 this.sexIconView = (ImageView) view.findViewById(R.id.sexIcon);
-                this.moodView = (TextView) view.findViewById(R.id.mood);
+                this.signView = (TextView) view.findViewById(R.id.sign);
                 this.ageView = (TextView) view.findViewById(R.id.age);
             }
         }

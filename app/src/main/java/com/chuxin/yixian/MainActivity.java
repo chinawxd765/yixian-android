@@ -200,6 +200,6 @@ public class MainActivity extends BaseActivity
      */
     @Override
     public void onListFragmentInteraction(User user) {
-        Toast.makeText(this, user.getNickName(), Toast.LENGTH_SHORT).show();
+        UserActivity.start(this, user.getId());
     }
 }

@@ -51,7 +51,7 @@
         android:id="@+id/age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/mood"
+        android:layout_above="@+id/sign"
         android:layout_toRightOf="@+id/sexIcon"
         android:layout_toEndOf="@+id/sexIcon"
         android:layout_marginLeft="4dp"
@@ -59,21 +59,21 @@
         android:textSize="12sp"/>
 
     <TextView
-        android:id="@+id/mood"
+        android:id="@+id/sign"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/sexIcon"
         android:layout_toRightOf="@+id/headImage"
         android:layout_toEndOf="@+id/headImage"
         android:fontFamily="sans-serif"
-        android:text="@string/user_mood"
+        android:text="@string/user_sign"
         android:textSize="14sp" />
 
     <!-- 分隔线 -->
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@+id/mood"
+        android:layout_below="@+id/sign"
         android:layout_toRightOf="@+id/headImage"
         android:layout_toEndOf="@+id/headImage"
         android:layout_marginTop="8dp"
