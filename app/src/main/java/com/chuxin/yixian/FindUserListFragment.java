@@ -69,6 +69,9 @@ public class FindUserListFragment extends Fragment {
     private Bitmap boyIcon;
     private Bitmap girlIcon;
 
+    private static final String BOY = "BOY";
+    private static final String GIRL = "GIRL";
+
     /**
      * 创建新实例
      * @return FindUserListFragment实例
@@ -137,8 +140,9 @@ public class FindUserListFragment extends Fragment {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_SETTLING
-                        && lastVisibleItemPosition + 1 == recyclerViewAdapter.getItemCount()
-                        && !recyclerViewAdapter.isLoading()) {
+                        && !recyclerViewAdapter.isLoading()  // 不是加载中状态
+                        && (lastVisibleItemPosition + 1 == recyclerViewAdapter.getItemCount()    // 已显示到最后一项目，或，显示0个项目
+                        || recyclerViewAdapter.getItemCount() == 0)) {
 
                     LogUtil.i("recyclerView", "=======================上拉========================");
 
@@ -357,11 +361,12 @@ public class FindUserListFragment extends Fragment {
 
                 userViewHolder.nickNameView.setText(user.getNickName());
                 userViewHolder.moodView.setText(user.getMood());
+                userViewHolder.ageView.setText(user.getAge());
 
                 // 设置性别图标
-                if ("BOY".equals(user.getSex())) {
+                if (BOY.equals(user.getSex())) {
                     userViewHolder.sexIconView.setImageBitmap(boyIcon);
-                } else {
+                } else if (GIRL.equals(user.getSex())) {
                     userViewHolder.sexIconView.setImageBitmap(girlIcon);
                 }
 
@@ -438,6 +443,10 @@ public class FindUserListFragment extends Fragment {
                     user.setHeadImageSrc(userJsonOnject.getString("headImageSrc"));
                     user.setMood(userJsonOnject.getString("mood"));
 
+                    if (userJsonOnject.getInt("age") > 0) {
+                        user.setAge(userJsonOnject.getString("age"));
+                    }
+
                     userList.add(user);
                 }
             } catch(Exception e) {
@@ -478,6 +487,7 @@ public class FindUserListFragment extends Fragment {
             public final TextView nickNameView;
             public final ImageView sexIconView;
             public final TextView moodView;
+            public final TextView ageView;
             public User user;
 
             public UserViewHolder(View view) {
@@ -487,6 +497,7 @@ public class FindUserListFragment extends Fragment {
                 this.nickNameView = (TextView) view.findViewById(R.id.nickName);
                 this.sexIconView = (ImageView) view.findViewById(R.id.sexIcon);
                 this.moodView = (TextView) view.findViewById(R.id.mood);
+                this.ageView = (TextView) view.findViewById(R.id.age);
             }
         }
 

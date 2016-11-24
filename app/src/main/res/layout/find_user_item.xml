@@ -10,77 +10,6 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:id="@+id/headImage"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"
-        android:contentDescription="@string/user_head_image_description"
-        android:src="@drawable/default_head_image"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/user_nick_name"
-        android:id="@+id/nickName"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"/>
-
-    <ImageView
-        android:id="@+id/sexIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_below="@+id/nickName"
-        android:contentDescription="@string/user_sex_icon_description"
-        android:src="@drawable/icon_boy"
-        android:layout_toRightOf="@+id/headImage" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/user_mood"
-        android:id="@+id/mood"
-        android:fontFamily="sans-serif"
-        android:textSize="14sp"
-        android:layout_below="@+id/sexIcon"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage" />
-
-    <!-- 分隔线 -->
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/mood"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorItemDividers"
-        android:contentDescription="@string/dividers_description"/>
-
-</RelativeLayout>
-
-
-<!--
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:clickable="true"
-    android:focusable="true"
-    tools:context=".MainActivity">
-
-    <ImageView
         android:id="@+id/headImage"
         android:layout_width="56dp"
         android:layout_height="56dp"
@@ -97,12 +26,12 @@
         android:id="@+id/nickName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/user_nick_name"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/headImage"
         android:layout_toEndOf="@+id/headImage"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
+        android:text="@string/user_nick_name"
         android:textSize="16sp"
         android:textColor="@android:color/black"/>
 
@@ -113,29 +42,42 @@
         android:layout_below="@+id/nickName"
         android:layout_toRightOf="@+id/headImage"
         android:layout_toEndOf="@+id/headImage"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
         android:contentDescription="@string/user_sex_icon_description"
-        android:layout_above="@+id/mood" />
+        android:src="@drawable/icon_boy"  />
+
+    <TextView
+        android:id="@+id/age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/mood"
+        android:layout_toRightOf="@+id/sexIcon"
+        android:layout_toEndOf="@+id/sexIcon"
+        android:layout_marginLeft="4dp"
+        android:text="@string/user_age"
+        android:textSize="12sp"/>
 
     <TextView
         android:id="@+id/mood"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/user_mood"
         android:layout_below="@+id/sexIcon"
         android:layout_toRightOf="@+id/headImage"
         android:layout_toEndOf="@+id/headImage"
-        android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif"
-        android:textSize="14sp"/>
+        android:text="@string/user_mood"
+        android:textSize="14sp" />
 
+    <!-- 分隔线 -->
     <ImageView
         android:layout_width="fill_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:layout_below="@+id/mood"
         android:layout_toRightOf="@+id/headImage"
         android:layout_toEndOf="@+id/headImage"
+        android:layout_marginTop="8dp"
         android:background="@color/colorItemDividers"
         android:contentDescription="@string/dividers_description"/>
 
 </RelativeLayout>
--->

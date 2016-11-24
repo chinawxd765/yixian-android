@@ -12,6 +12,8 @@ public class User {
     private String headImageSrc;    // 头像
     private String mood;  // 心情
 
+    private String age;  // 年龄
+
     public int getId() {
         return id;
     }
@@ -50,5 +52,13 @@ public class User {
 
     public void setMood(String mood) {
         this.mood = mood;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
     }
 }
