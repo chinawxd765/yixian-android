@@ -6,7 +6,7 @@ package com.chuxin.yixian.model;
  */
 public class User {
 
-    private int id;  // 主键ID
+    private long id;  // 主键ID
     private String nickName;  // 昵称
     private String sex;  // 性别
     private String headImageSrc;    // 头像
@@ -14,11 +14,11 @@ public class User {
 
     private String age;  // 年龄
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

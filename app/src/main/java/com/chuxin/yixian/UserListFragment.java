@@ -1,9 +1,7 @@
 package com.chuxin.yixian;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,8 +17,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chuxin.yixian.enumType.SexEnum;
 import com.chuxin.yixian.framework.Constant;
 import com.chuxin.yixian.framework.LogUtil;
+import com.chuxin.yixian.framework.MyApplication;
 import com.chuxin.yixian.model.User;
 import com.yolanda.nohttp.NoHttp;
 import com.yolanda.nohttp.RequestMethod;
@@ -47,8 +47,9 @@ import java.util.List;
  */
 public class UserListFragment extends Fragment {
 
-    private static final int WHAT_USER_LIST_ONLOAD = 0;  // 初次加载
-    private static final int WHAT_USER_LIST_UP_LOADMORE = 1;  // 上拉刷新
+    private static final int WHAT_USER_LIST_ONLOAD = 0;  // 初次加载用户列表标志
+    private static final int WHAT_USER_LIST_UP_LOADMORE = 1;  // 上拉刷新加载用户列表标志
+    private static final int WHAT_USER_HEAD_IMAGE = 2;  // 加载用户头像标志
 
     private int firstVisibleItemPosition = 0;    // 屏幕可见首个显示项目的序列号
     private int firstVisibleItemTop = 0;    // 屏幕可见首个显示项目与顶部的偏移
@@ -64,21 +65,11 @@ public class UserListFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
 
     /**
-     * 男女性别图标
-     */
-    private Bitmap boyIcon;
-    private Bitmap girlIcon;
-
-    private static final String BOY = "BOY";
-    private static final String GIRL = "GIRL";
-
-    /**
      * 创建新实例
      * @return FindUserListFragment实例
      */
-    public static final UserListFragment newInstance() {
-        UserListFragment fragment = new UserListFragment();
-        return fragment;
+    static UserListFragment newInstance() {
+        return new UserListFragment();
     }
 
     @Override
@@ -87,10 +78,6 @@ public class UserListFragment extends Fragment {
 
         NoHttp.initialize(this.getActivity().getApplication());
         requestQueue = NoHttp.newRequestQueue();
-
-        Resources res = getResources();
-        boyIcon = BitmapFactory.decodeResource(res, R.drawable.icon_boy);
-        girlIcon = BitmapFactory.decodeResource(res, R.drawable.icon_girl);
     }
 
     @Override
@@ -207,8 +194,8 @@ public class UserListFragment extends Fragment {
         }
 
         if (requestQueue != null) {
-            requestQueue.cancelAll();// 退出APP时停止所有请求
-            requestQueue.stop();// 退出APP时停止队列
+            requestQueue.cancelAll();// 退出Fragment时停止所有请求
+            requestQueue.stop();// 退出Fragment时停止队列
         }
     }
 
@@ -220,11 +207,9 @@ public class UserListFragment extends Fragment {
         try {
             String url = Constant.APP_SERVER_IP
                     .concat(Constant.APP_ROOT_PATH)
-                    .concat("/json/user/findPageUserList.action?pageNo=")
-                    .concat(String.valueOf(pageNo));
+                    .concat("/json/user/findPageUserList.action");
             Request<JSONObject> request = NoHttp.createJsonObjectRequest(url, RequestMethod.GET);
-
-//            request.add("cmsProvinceCityId", provinceId);
+            request.add("pageNo", pageNo);
 
             // 发起请求
             requestQueue.add(what, request, onResponseListener);
@@ -273,7 +258,7 @@ public class UserListFragment extends Fragment {
                 if (userArray.length() > 0) {
                     recyclerViewAdapter.addUserToList(userArray);
                 } else {
-                    Toast.makeText(getContext(), "没有了！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "没有了。", Toast.LENGTH_SHORT).show();
                 }
             } catch(Exception e) {
                 LogUtil.e("error", "绑定用户列表异常。");
@@ -296,7 +281,7 @@ public class UserListFragment extends Fragment {
             errorMsg = errorMsg.concat(",").concat(e.toString()).concat(",").concat(String.valueOf(resCode));
             LogUtil.e("onFailed", errorMsg);
 
-            Toast.makeText(getContext(), "加载用户数据失败...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "加载用户数据失败。", Toast.LENGTH_SHORT).show();
 
             if (what == WHAT_USER_LIST_ONLOAD) {
 
@@ -319,12 +304,10 @@ public class UserListFragment extends Fragment {
     /**
      * RecyclerView适配器
      */
-    public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private static final int USER_ITEM = 0;  // 用户项
         private static final int USER_LOADING = 1;  // “加载中”项
-
-        private View selectedView;  // 选中项
 
         private List<User> userList = new ArrayList<>();  // 用户列表
 
@@ -355,7 +338,7 @@ public class UserListFragment extends Fragment {
 
             if (holder instanceof UserViewHolder) {
                 final UserViewHolder userViewHolder = (UserViewHolder) holder;
-                User user = userList.get(position);
+                final User user = userList.get(position);
                 userViewHolder.user = user;
 
                 userViewHolder.nickNameView.setText(user.getNickName());
@@ -363,10 +346,10 @@ public class UserListFragment extends Fragment {
                 userViewHolder.ageView.setText(user.getAge());
 
                 // 设置性别图标
-                if (BOY.equals(user.getSex())) {
-                    userViewHolder.sexIconView.setImageBitmap(boyIcon);
-                } else if (GIRL.equals(user.getSex())) {
-                    userViewHolder.sexIconView.setImageBitmap(girlIcon);
+                if (SexEnum.BOY.name().equals(user.getSex())) {
+                    userViewHolder.sexIconView.setImageBitmap(MyApplication.getBoyIcon());
+                } else if (SexEnum.GIRL.name().equals(user.getSex())) {
+                    userViewHolder.sexIconView.setImageBitmap(MyApplication.getGirlIcon());
                 }
 
                 // 加载头像
@@ -383,14 +366,14 @@ public class UserListFragment extends Fragment {
 
                     Request<Bitmap> imageRequest = NoHttp.createImageRequest(headImageSrc);
                     imageRequest.setCacheMode(CacheMode.NONE_CACHE_REQUEST_NETWORK);
-                    requestQueue.add(user.getId(), imageRequest, new SimpleResponseListener<Bitmap>() {
+                    requestQueue.add(WHAT_USER_HEAD_IMAGE, imageRequest, new SimpleResponseListener<Bitmap>() {
 
                         @Override
                         public void onSucceed(int i, Response<Bitmap> response) {
                             if (response.get() != null) {
                                 userViewHolder.headImageView.setImageBitmap(response.get());
                                 headImageMap.put(headImageSrc, response.get());
-                                LogUtil.d("headImage", String.valueOf(i) + "," + headImageSrc);
+                                LogUtil.d("headImage", String.valueOf(user.getId()) + "," + headImageSrc);
                             }
                         }
 
@@ -400,6 +383,7 @@ public class UserListFragment extends Fragment {
                     });
                 }
 
+                // 单击事件
                 userViewHolder.view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -430,7 +414,7 @@ public class UserListFragment extends Fragment {
                     JSONObject userJsonOnject = userArray.getJSONObject(i);
                     final User user = new User();
 
-                    user.setId(userJsonOnject.getInt("id"));
+                    user.setId(userJsonOnject.getLong("id"));
                     user.setNickName(userJsonOnject.getString("nickName"));
                     user.setSex(userJsonOnject.getString("sex"));
                     user.setHeadImageSrc(userJsonOnject.getString("headImageSrc"));
@@ -515,7 +499,6 @@ public class UserListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(User user);
     }
 }

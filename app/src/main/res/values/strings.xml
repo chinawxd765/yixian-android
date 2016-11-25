@@ -5,7 +5,7 @@
     <string name="user_nick_name">昵称</string>
     <string name="user_age">年龄</string>
     <string name="user_sign">签名</string>
-    <string name="user_head_image_description">用户图片</string>
+    <string name="user_head_image_description">用户头像</string>
     <string name="user_sex_icon_description">用户性别图标</string>
     <string name="dividers_description">分隔线</string>
     <string name="action_settings">Settings</string>
