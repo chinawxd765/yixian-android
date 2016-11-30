@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chuxin.yixian.enumType.EducationEnum;
+import com.chuxin.yixian.enumType.IncomeEnum;
 import com.chuxin.yixian.enumType.SexEnum;
 import com.chuxin.yixian.framework.Constant;
 import com.chuxin.yixian.framework.LogUtil;
@@ -103,13 +105,13 @@ public class UserActivity extends AppCompatActivity {
                     JSONObject result = response.get();// 响应结果
                     JSONObject userJsonOnject = result.getJSONObject("user");
 
-                    // 设置标题：昵称
+                    // 标题：昵称
                     CollapsingToolbarLayout toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
                     if (toolBarLayout != null) {
                         toolBarLayout.setTitle(userJsonOnject.getString("nickName"));
                     }
 
-                    // 加载头像
+                    // 头像
                     String headImageSrc = Constant.APP_SERVER_IP
                             .concat(Constant.RESOURCE_ROOT_PATH)
                             .concat(userJsonOnject.getString("headImageSrc"));
@@ -130,7 +132,7 @@ public class UserActivity extends AppCompatActivity {
                         }
                     });
 
-                    // 设置性别图标
+                    // 性别图标
                     ImageView sexIconView = (ImageView) findViewById(R.id.sexIcon);
                     if (SexEnum.BOY.name().equals(userJsonOnject.getString("sex"))) {
                         sexIconView.setImageBitmap(MyApplication.getBoyIcon());
@@ -138,9 +140,60 @@ public class UserActivity extends AppCompatActivity {
                         sexIconView.setImageBitmap(MyApplication.getGirlIcon());
                     }
 
-                    // 设置年龄
+                    // 年龄
                     TextView ageView = (TextView) findViewById(R.id.age);
-                    ageView.setText(userJsonOnject.getString("age"));
+                    if (userJsonOnject.getInt("age") > 0) {
+                        ageView.setText(userJsonOnject.getString("age"));
+                    }
+
+                    // 个性签名
+                    TextView signView = (TextView) findViewById(R.id.sign);
+                    signView.setText(userJsonOnject.getString("sign"));
+
+                    // 家乡
+                    TextView hometownView = (TextView) findViewById(R.id.hometown);
+                    hometownView.setText("家乡：".concat(userJsonOnject.getString("hometownArea")));
+
+                    // 学校、专业、年级
+                    TextView schoolView = (TextView) findViewById(R.id.school);
+                    String school = userJsonOnject.getString("school").concat("  ");
+                    school = school.concat(userJsonOnject.getString("major")).concat("  ");
+                    school = school.concat(userJsonOnject.getString("grade")).concat("级");
+                    schoolView.setText("学校：".concat(school));
+
+                    // 学历
+                    TextView educationView = (TextView) findViewById(R.id.education);
+                    EducationEnum educationEnum = EducationEnum.valueOf(userJsonOnject.getString("education"));
+                    educationView.setText("学历：".concat(educationEnum.getDescription()));
+
+                    // 职业
+                    TextView professionView = (TextView) findViewById(R.id.profession);
+                    professionView.setText("职业：".concat(userJsonOnject.getString("profession")));
+
+                    // 收入
+                    TextView incomeView = (TextView) findViewById(R.id.income);
+                    IncomeEnum incomeEnum = IncomeEnum.valueOf(userJsonOnject.getString("income"));
+                    incomeView.setText("年收入：".concat(incomeEnum.getDescription()));
+
+                    // 现居住地
+                    TextView residenceView = (TextView) findViewById(R.id.residence);
+                    residenceView.setText("现居住地：".concat(userJsonOnject.getString("residenceArea")));
+
+                    // 性格描述
+                    TextView personalityView = (TextView) findViewById(R.id.personality);
+                    personalityView.setText(userJsonOnject.getString("personality"));
+
+                    // 兴趣爱好
+                    TextView hobbiesView = (TextView) findViewById(R.id.hobbies);
+                    hobbiesView.setText(userJsonOnject.getString("hobbies"));
+
+                    // 事业展望
+                    TextView expectationView = (TextView) findViewById(R.id.expectation);
+                    expectationView.setText(userJsonOnject.getString("expectation"));
+
+                    // 个人说明
+                    TextView descriptionView = (TextView) findViewById(R.id.description);
+                    descriptionView.setText(userJsonOnject.getString("description"));
 
                 } catch(Exception e) {
                     Toast.makeText(getBaseContext(), "加载用户信息异常。", Toast.LENGTH_SHORT).show();
