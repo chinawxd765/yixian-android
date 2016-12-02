@@ -10,7 +10,7 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/headImage"
+        android:id="@+id/head_image"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_alignParentTop="true"
@@ -23,12 +23,12 @@
         android:src="@drawable/default_head_image"/>
 
     <TextView
-        android:id="@+id/nickName"
+        android:id="@+id/nick_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage"
+        android:layout_toRightOf="@+id/head_image"
+        android:layout_toEndOf="@+id/head_image"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
         android:text="@string/user_nick_name"
@@ -36,12 +36,12 @@
         android:textColor="@android:color/black"/>
 
     <ImageView
-        android:id="@+id/sexIcon"
+        android:id="@+id/sex_icon"
         android:layout_width="14dp"
         android:layout_height="14dp"
-        android:layout_below="@+id/nickName"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage"
+        android:layout_below="@+id/nick_name"
+        android:layout_toRightOf="@+id/head_image"
+        android:layout_toEndOf="@+id/head_image"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
         android:contentDescription="@string/user_sex_icon_description"
@@ -52,8 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/sign"
-        android:layout_toRightOf="@+id/sexIcon"
-        android:layout_toEndOf="@+id/sexIcon"
+        android:layout_toRightOf="@+id/sex_icon"
+        android:layout_toEndOf="@+id/sex_icon"
         android:layout_marginLeft="4dp"
         android:text="@string/user_age"
         android:textSize="12sp"/>
@@ -62,9 +62,9 @@
         android:id="@+id/sign"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sexIcon"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage"
+        android:layout_below="@+id/sex_icon"
+        android:layout_toRightOf="@+id/head_image"
+        android:layout_toEndOf="@+id/head_image"
         android:fontFamily="sans-serif"
         android:text="@string/user_sign"
         android:textSize="14sp" />
@@ -74,8 +74,8 @@
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
         android:layout_below="@+id/sign"
-        android:layout_toRightOf="@+id/headImage"
-        android:layout_toEndOf="@+id/headImage"
+        android:layout_toRightOf="@+id/head_image"
+        android:layout_toEndOf="@+id/head_image"
         android:layout_marginTop="8dp"
         android:background="@color/colorItemDividers"
         android:contentDescription="@string/dividers_description"/>

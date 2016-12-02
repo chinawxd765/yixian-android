@@ -3,6 +3,7 @@ package com.chuxin.yixian;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -15,8 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.chuxin.yixian.framework.ActivityCollector;
 import com.chuxin.yixian.framework.BaseActivity;
 import com.chuxin.yixian.model.User;
 
@@ -136,7 +137,8 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_main_quit) {
+            ActivityCollector.finishAll();
             return true;
         }
 
@@ -199,7 +201,14 @@ public class MainActivity extends BaseActivity
      * @param user 用户
      */
     @Override
-    public void onListFragmentInteraction(User user) {
-        UserActivity.start(this, user.getId());
+    public void onListFragmentInteraction(User user, View view) {
+
+        // TODO
+        // 转场动画，从当前头像拉升到下一个活动
+        // 在android4.4.2下未生效
+        ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeScaleUpAnimation(
+                        view, view.getWidth() / 2, view.getHeight() / 2, 0, 0);
+        UserActivity.start(this, user.getId(), options);
     }
 }

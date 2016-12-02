@@ -7,11 +7,16 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +27,8 @@ import com.chuxin.yixian.enumType.SexEnum;
 import com.chuxin.yixian.framework.Constant;
 import com.chuxin.yixian.framework.LogUtil;
 import com.chuxin.yixian.framework.MyApplication;
+import com.chuxin.yixian.framework.NoHttpUtil;
+import com.chuxin.yixian.model.UserImage;
 import com.yolanda.nohttp.NoHttp;
 import com.yolanda.nohttp.RequestMethod;
 import com.yolanda.nohttp.rest.CacheMode;
@@ -34,25 +41,32 @@ import com.yolanda.nohttp.rest.SimpleResponseListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserActivity extends AppCompatActivity {
 
     private static final int WHAT_USER = 0;  // 加载用户信息标志
     private static final int WHAT_USER_HEAD_IMAGE = 2;  // 加载用户头像标志
+    private static final int WHAT_USER_IMAGE = 3;  // 加载用户图片标志
 
     // 参数名称
     public static final String USER_ID = "userId";
 
     private RequestQueue requestQueue;
+    private RecyclerView recyclerView;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     /**
      * 启动当前活动
      * @param context 环境
      * @param userId 用户ID
+     * @param options 转场动画
      */
-    protected static void start(Context context, long userId) {
+    protected static void start(Context context, long userId, ActivityOptionsCompat options) {
         Intent intent = new Intent(context, UserActivity.class);
         intent.putExtra(USER_ID, userId);
-        context.startActivity(intent);
+        context.startActivity(intent, options.toBundle());
     }
 
     @Override
@@ -71,8 +85,14 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
-        NoHttp.initialize(this.getApplication());
-        requestQueue = NoHttp.newRequestQueue();
+        requestQueue = NoHttpUtil.newRequestQueue(this.getApplication());
+
+        recyclerView = (RecyclerView) findViewById(R.id.user_image_recycler_view);
+//        GridLayoutManager mgr = new GridLayoutManager(this, 4);
+//        recyclerView.setLayoutManager(mgr);
+
+        recyclerViewAdapter = new RecyclerViewAdapter();
+        recyclerView.setAdapter(recyclerViewAdapter);
 
         try {
             String url = Constant.APP_SERVER_IP
@@ -103,18 +123,18 @@ public class UserActivity extends AppCompatActivity {
 
                 try {
                     JSONObject result = response.get();// 响应结果
-                    JSONObject userJsonOnject = result.getJSONObject("user");
+                    JSONObject userJsonObject = result.getJSONObject("user");
 
                     // 标题：昵称
                     CollapsingToolbarLayout toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
                     if (toolBarLayout != null) {
-                        toolBarLayout.setTitle(userJsonOnject.getString("nickName"));
+                        toolBarLayout.setTitle(userJsonObject.getString("nickName"));
                     }
 
                     // 头像
                     String headImageSrc = Constant.APP_SERVER_IP
                             .concat(Constant.RESOURCE_ROOT_PATH)
-                            .concat(userJsonOnject.getString("headImageSrc"));
+                            .concat(userJsonObject.getString("headImageSrc"));
                     Request<Bitmap> imageRequest = NoHttp.createImageRequest(headImageSrc);
                     imageRequest.setCacheMode(CacheMode.NONE_CACHE_REQUEST_NETWORK);
                     requestQueue.add(WHAT_USER_HEAD_IMAGE, imageRequest, new SimpleResponseListener<Bitmap>() {
@@ -122,7 +142,7 @@ public class UserActivity extends AppCompatActivity {
                         @Override
                         public void onSucceed(int i, Response<Bitmap> response) {
                             if (response.get() != null) {
-                                ImageView headImageView = (ImageView) findViewById(R.id.headImage);
+                                ImageView headImageView = (ImageView) findViewById(R.id.head_image);
                                 headImageView.setImageBitmap(response.get());
                             }
                         }
@@ -132,69 +152,110 @@ public class UserActivity extends AppCompatActivity {
                         }
                     });
 
+                    // 用户图片
+                    JSONArray userImageArray = result.getJSONArray("userImageList");
+                    if (userImageArray.length() > 0) {
+                        recyclerViewAdapter.addUserImageToList(userImageArray);
+                        recyclerViewAdapter.notifyDataSetChanged();
+                    }
+
                     // 性别图标
-                    ImageView sexIconView = (ImageView) findViewById(R.id.sexIcon);
-                    if (SexEnum.BOY.name().equals(userJsonOnject.getString("sex"))) {
+                    ImageView sexIconView = (ImageView) findViewById(R.id.sex_icon);
+                    if (SexEnum.BOY.name().equals(userJsonObject.getString("sex"))) {
                         sexIconView.setImageBitmap(MyApplication.getBoyIcon());
-                    } else if (SexEnum.GIRL.name().equals(userJsonOnject.getString("sex"))) {
+                    } else if (SexEnum.GIRL.name().equals(userJsonObject.getString("sex"))) {
                         sexIconView.setImageBitmap(MyApplication.getGirlIcon());
                     }
 
                     // 年龄
-                    TextView ageView = (TextView) findViewById(R.id.age);
-                    if (userJsonOnject.getInt("age") > 0) {
-                        ageView.setText(userJsonOnject.getString("age"));
+                    if (userJsonObject.get("age") instanceof Integer && userJsonObject.getInt("age") > 0) {
+                        TextView ageView = (TextView) findViewById(R.id.age);
+                        ageView.setText(userJsonObject.getString("age"));
+                    }
+
+                    // 生日
+                    if (userJsonObject.get("birthday") instanceof String) {
+                        TextView birthdayView = (TextView) findViewById(R.id.birthday);
+                        birthdayView.setText("生日：".concat(userJsonObject.getString("birthday")));
                     }
 
                     // 个性签名
-                    TextView signView = (TextView) findViewById(R.id.sign);
-                    signView.setText(userJsonOnject.getString("sign"));
+                    if (userJsonObject.get("sign") instanceof String) {
+                        TextView signView = (TextView) findViewById(R.id.sign);
+                        signView.setText(userJsonObject.getString("sign"));
+                    }
 
                     // 家乡
-                    TextView hometownView = (TextView) findViewById(R.id.hometown);
-                    hometownView.setText("家乡：".concat(userJsonOnject.getString("hometownArea")));
+                    if (userJsonObject.get("hometownArea") instanceof String) {
+                        TextView hometownView = (TextView) findViewById(R.id.hometown);
+                        hometownView.setText("家乡：".concat(userJsonObject.getString("hometownArea")));
+                    }
 
                     // 学校、专业、年级
-                    TextView schoolView = (TextView) findViewById(R.id.school);
-                    String school = userJsonOnject.getString("school").concat("  ");
-                    school = school.concat(userJsonOnject.getString("major")).concat("  ");
-                    school = school.concat(userJsonOnject.getString("grade")).concat("级");
-                    schoolView.setText("学校：".concat(school));
+                    String school = "";
+                    if (userJsonObject.get("school") instanceof String) {
+                        school = userJsonObject.getString("school").concat("  ");
+                    }
+                    if (userJsonObject.get("major") instanceof String) {
+                        school = school.concat(userJsonObject.getString("major")).concat("  ");
+                    }
+                    if (userJsonObject.get("grade") instanceof String) {
+                        school = school.concat(userJsonObject.getString("grade")).concat("级");
+                    }
+                    if (!school.isEmpty()) {
+                        TextView schoolView = (TextView) findViewById(R.id.school);
+                        schoolView.setText("学校：".concat(school));
+                    }
 
                     // 学历
-                    TextView educationView = (TextView) findViewById(R.id.education);
-                    EducationEnum educationEnum = EducationEnum.valueOf(userJsonOnject.getString("education"));
-                    educationView.setText("学历：".concat(educationEnum.getDescription()));
+                    if (userJsonObject.get("education") instanceof String) {
+                        TextView educationView = (TextView) findViewById(R.id.education);
+                        EducationEnum educationEnum = EducationEnum.valueOf(userJsonObject.getString("education"));
+                        educationView.setText("学历：".concat(educationEnum.getDescription()));
+                    }
 
                     // 职业
-                    TextView professionView = (TextView) findViewById(R.id.profession);
-                    professionView.setText("职业：".concat(userJsonOnject.getString("profession")));
+                    if (userJsonObject.get("profession") instanceof String) {
+                        TextView professionView = (TextView) findViewById(R.id.profession);
+                        professionView.setText("职业：".concat(userJsonObject.getString("profession")));
+                    }
 
                     // 收入
-                    TextView incomeView = (TextView) findViewById(R.id.income);
-                    IncomeEnum incomeEnum = IncomeEnum.valueOf(userJsonOnject.getString("income"));
-                    incomeView.setText("年收入：".concat(incomeEnum.getDescription()));
+                    if (userJsonObject.get("income") instanceof String) {
+                        TextView incomeView = (TextView) findViewById(R.id.income);
+                        IncomeEnum incomeEnum = IncomeEnum.valueOf(userJsonObject.getString("income"));
+                        incomeView.setText("年收入：".concat(incomeEnum.getDescription()));
+                    }
 
                     // 现居住地
-                    TextView residenceView = (TextView) findViewById(R.id.residence);
-                    residenceView.setText("现居住地：".concat(userJsonOnject.getString("residenceArea")));
+                    if (userJsonObject.get("residenceArea") instanceof String) {
+                        TextView residenceView = (TextView) findViewById(R.id.residence);
+                        residenceView.setText("现居住地：".concat(userJsonObject.getString("residenceArea")));
+                    }
 
                     // 性格描述
-                    TextView personalityView = (TextView) findViewById(R.id.personality);
-                    personalityView.setText(userJsonOnject.getString("personality"));
+                    if (userJsonObject.get("personality") instanceof String) {
+                        TextView personalityView = (TextView) findViewById(R.id.personality);
+                        personalityView.setText(userJsonObject.getString("personality"));
+                    }
 
                     // 兴趣爱好
-                    TextView hobbiesView = (TextView) findViewById(R.id.hobbies);
-                    hobbiesView.setText(userJsonOnject.getString("hobbies"));
+                    if (userJsonObject.get("hobbies") instanceof String) {
+                        TextView hobbiesView = (TextView) findViewById(R.id.hobbies);
+                        hobbiesView.setText(userJsonObject.getString("hobbies"));
+                    }
 
                     // 事业展望
-                    TextView expectationView = (TextView) findViewById(R.id.expectation);
-                    expectationView.setText(userJsonOnject.getString("expectation"));
+                    if (userJsonObject.get("expectation") instanceof String) {
+                        TextView expectationView = (TextView) findViewById(R.id.expectation);
+                        expectationView.setText(userJsonObject.getString("expectation"));
+                    }
 
                     // 个人说明
-                    TextView descriptionView = (TextView) findViewById(R.id.description);
-                    descriptionView.setText(userJsonOnject.getString("description"));
-
+                    if (userJsonObject.get("description") instanceof String) {
+                        TextView descriptionView = (TextView) findViewById(R.id.description);
+                        descriptionView.setText(userJsonObject.getString("description"));
+                    }
                 } catch(Exception e) {
                     Toast.makeText(getBaseContext(), "加载用户信息异常。", Toast.LENGTH_SHORT).show();
                     LogUtil.e("error", "加载用户信息异常。");
@@ -228,24 +289,13 @@ public class UserActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        doBeforeLeave();
+        NoHttpUtil.stopRequestQueue(requestQueue);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        doBeforeLeave();
-    }
-
-    /**
-     * 退出活动时释放部分资源
-     */
-    private void doBeforeLeave() {
-
-        if (requestQueue != null) {
-            requestQueue.cancelAll();// 退出活动时停止所有请求
-            requestQueue.stop();// 退出活动时停止队列
-        }
+        NoHttpUtil.stopRequestQueue(requestQueue);
     }
 
     @Override
@@ -268,5 +318,107 @@ public class UserActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * RecyclerView适配器
+     */
+    private class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+        private List<UserImage> userImageList = new ArrayList<>();  // 用户图片列表
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_content_image_item, parent, false);
+            return new UserImageViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+
+            if (holder instanceof UserImageViewHolder) {
+                final UserImageViewHolder userImageViewHolder = (UserImageViewHolder) holder;
+                final UserImage userImage = userImageList.get(position);
+                userImageViewHolder.userImage = userImage;
+
+                // 加载用户图片
+                final String userImageSrc = Constant.APP_SERVER_IP
+                        .concat(Constant.RESOURCE_ROOT_PATH)
+                        .concat(userImage.getImageSrc());
+                Request<Bitmap> imageRequest = NoHttp.createImageRequest(userImageSrc);
+                imageRequest.setCacheMode(CacheMode.NONE_CACHE_REQUEST_NETWORK);
+                requestQueue.add(WHAT_USER_IMAGE, imageRequest, new SimpleResponseListener<Bitmap>() {
+
+                    @Override
+                    public void onSucceed(int i, Response<Bitmap> response) {
+                        if (response.get() != null) {
+                            userImageViewHolder.userImageView.setImageBitmap(response.get());
+                        }
+
+                        // 设置图片高度与宽度相等
+                        ViewGroup.LayoutParams layoutParams = userImageViewHolder.userImageView.getLayoutParams();
+                        layoutParams.width = userImageViewHolder.userImageView.getWidth();
+                        layoutParams.height = layoutParams.width;
+                        userImageViewHolder.userImageView.setLayoutParams(layoutParams);
+                    }
+
+                    @Override
+                    public void onFailed(int i, String s, Object o, Exception e, int i1, long l) {
+                    }
+                });
+
+                // 单击事件
+                userImageViewHolder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Toast.makeText(getBaseContext(), "hehe", Toast.LENGTH_LONG);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return userImageList.size();
+        }
+
+        /**
+         * 将用户图片Json数组转换后加入用户图片列表
+         * @param userImageArray 用户图片Json数组
+         */
+        public void addUserImageToList(JSONArray userImageArray) {
+
+            try {
+                for (int i = 0; i < userImageArray.length(); i++) {
+                    JSONObject userJsonOnject = userImageArray.getJSONObject(i);
+                    UserImage userImage = new UserImage();
+
+                    userImage.setId(userJsonOnject.getLong("id"));
+                    userImage.setImageSrc(userJsonOnject.getString("imageSrc"));
+
+                    userImageList.add(userImage);
+                }
+            } catch(Exception e) {
+                LogUtil.e("error", "将用户图片Json数组转换后加入用户图片列表异常。");
+            }
+        }
+
+        /**
+         * 用户图片项
+         */
+        public class UserImageViewHolder extends RecyclerView.ViewHolder {
+            public final View view;
+            public final ImageView userImageView;
+            public UserImage userImage;
+
+            public UserImageViewHolder(View view) {
+                super(view);
+                this.view = view;
+                this.userImageView = (ImageView) view.findViewById(R.id.user_image);
+            }
+        }
+
     }
 }

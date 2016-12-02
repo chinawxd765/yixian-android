@@ -21,6 +21,7 @@ import com.chuxin.yixian.enumType.SexEnum;
 import com.chuxin.yixian.framework.Constant;
 import com.chuxin.yixian.framework.LogUtil;
 import com.chuxin.yixian.framework.MyApplication;
+import com.chuxin.yixian.framework.NoHttpUtil;
 import com.chuxin.yixian.model.User;
 import com.yolanda.nohttp.NoHttp;
 import com.yolanda.nohttp.RequestMethod;
@@ -75,9 +76,7 @@ public class UserListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        NoHttp.initialize(this.getActivity().getApplication());
-        requestQueue = NoHttp.newRequestQueue();
+        requestQueue = NoHttpUtil.newRequestQueue(this.getActivity().getApplication());
     }
 
     @Override
@@ -85,7 +84,7 @@ public class UserListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.find_user_list_swipe_refresh_layout);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.user_list_swipe_refresh_layout);
 //        swipeRefreshLayout.setProgressBackgroundColorSchemeColor(Color.BLUE);
         swipeRefreshLayout.setColorSchemeColors(Color.GREEN, Color.YELLOW, Color.RED);
         swipeRefreshLayout.setProgressViewOffset(false, 0, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
@@ -101,7 +100,7 @@ public class UserListFragment extends Fragment {
             }
         });
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.find_user_list_recycler_view);
+        recyclerView = (RecyclerView) view.findViewById(R.id.user_list_recycler_view);
         if (recyclerViewAdapter == null) {
 
             // 首次载入的时候初始化适配器
@@ -184,6 +183,7 @@ public class UserListFragment extends Fragment {
     private void doBeforeLeave() {
 
         mListener = null;
+        NoHttpUtil.stopRequestQueue(requestQueue);
 
         // 获得屏幕可见首个显示项目的序列及偏移
         LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
@@ -191,11 +191,6 @@ public class UserListFragment extends Fragment {
         View view = linearLayoutManager.findViewByPosition(firstVisibleItemPosition);
         if (view != null) {
             firstVisibleItemTop = view.getTop();
-        }
-
-        if (requestQueue != null) {
-            requestQueue.cancelAll();// 退出Fragment时停止所有请求
-            requestQueue.stop();// 退出Fragment时停止队列
         }
     }
 
@@ -391,7 +386,7 @@ public class UserListFragment extends Fragment {
                         if (null != mListener) {
                             // Notify the active callbacks interface (the activity, if the
                             // fragment is attached to one) that an item has been selected.
-                            mListener.onListFragmentInteraction(userViewHolder.user);
+                            mListener.onListFragmentInteraction(userViewHolder.user, userViewHolder.headImageView);
                         }
                     }
                 });
@@ -411,17 +406,20 @@ public class UserListFragment extends Fragment {
 
             try {
                 for (int i = 0; i < userArray.length(); i++) {
-                    JSONObject userJsonOnject = userArray.getJSONObject(i);
+                    JSONObject userJsonObject = userArray.getJSONObject(i);
                     final User user = new User();
 
-                    user.setId(userJsonOnject.getLong("id"));
-                    user.setNickName(userJsonOnject.getString("nickName"));
-                    user.setSex(userJsonOnject.getString("sex"));
-                    user.setHeadImageSrc(userJsonOnject.getString("headImageSrc"));
-                    user.setSign(userJsonOnject.getString("sign"));
+                    user.setId(userJsonObject.getLong("id"));
+                    user.setNickName(userJsonObject.getString("nickName"));
+                    user.setSex(userJsonObject.getString("sex"));
+                    user.setHeadImageSrc(userJsonObject.getString("headImageSrc"));
 
-                    if (userJsonOnject.getInt("age") > 0) {
-                        user.setAge(userJsonOnject.getString("age"));
+                    if (userJsonObject.get("sign") instanceof String) {
+                        user.setSign(userJsonObject.getString("sign"));
+                    }
+
+                    if (userJsonObject.get("age") instanceof Integer && userJsonObject.getInt("age") > 0) {
+                        user.setAge(userJsonObject.getString("age"));
                     }
 
                     userList.add(user);
@@ -470,9 +468,9 @@ public class UserListFragment extends Fragment {
             public UserViewHolder(View view) {
                 super(view);
                 this.view = view;
-                this.headImageView = (ImageView) view.findViewById(R.id.headImage);
-                this.nickNameView = (TextView) view.findViewById(R.id.nickName);
-                this.sexIconView = (ImageView) view.findViewById(R.id.sexIcon);
+                this.headImageView = (ImageView) view.findViewById(R.id.head_image);
+                this.nickNameView = (TextView) view.findViewById(R.id.nick_name);
+                this.sexIconView = (ImageView) view.findViewById(R.id.sex_icon);
                 this.signView = (TextView) view.findViewById(R.id.sign);
                 this.ageView = (TextView) view.findViewById(R.id.age);
             }
@@ -499,6 +497,6 @@ public class UserListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(User user);
+        void onListFragmentInteraction(User user, View view);
     }
 }
