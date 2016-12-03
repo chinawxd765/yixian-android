@@ -418,7 +418,7 @@ public class UserListFragment extends Fragment {
                         user.setSign(userJsonObject.getString("sign"));
                     }
 
-                    if (userJsonObject.get("age") instanceof Integer && userJsonObject.getInt("age") > 0) {
+                    if (userJsonObject.get("age") instanceof Integer) {
                         user.setAge(userJsonObject.getString("age"));
                     }
 

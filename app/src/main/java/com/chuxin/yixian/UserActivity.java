@@ -9,7 +9,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -88,9 +87,6 @@ public class UserActivity extends AppCompatActivity {
         requestQueue = NoHttpUtil.newRequestQueue(this.getApplication());
 
         recyclerView = (RecyclerView) findViewById(R.id.user_image_recycler_view);
-//        GridLayoutManager mgr = new GridLayoutManager(this, 4);
-//        recyclerView.setLayoutManager(mgr);
-
         recyclerViewAdapter = new RecyclerViewAdapter();
         recyclerView.setAdapter(recyclerViewAdapter);
 
@@ -168,7 +164,7 @@ public class UserActivity extends AppCompatActivity {
                     }
 
                     // 年龄
-                    if (userJsonObject.get("age") instanceof Integer && userJsonObject.getInt("age") > 0) {
+                    if (userJsonObject.get("age") instanceof Integer) {
                         TextView ageView = (TextView) findViewById(R.id.age);
                         ageView.setText(userJsonObject.getString("age"));
                     }
@@ -373,7 +369,8 @@ public class UserActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Toast.makeText(getBaseContext(), "hehe", Toast.LENGTH_LONG);
+                        // TODO
+                        Toast.makeText(getBaseContext(), userImage.getImageSrc(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -419,6 +416,6 @@ public class UserActivity extends AppCompatActivity {
                 this.userImageView = (ImageView) view.findViewById(R.id.user_image);
             }
         }
-
     }
+
 }
