@@ -96,7 +96,7 @@ public class UserListFragment extends Fragment {
                 //TODO 下拉刷新
                 LogUtil.i("recyclerView", "=======================下拉========================");
                 swipeRefreshLayout.setRefreshing(false);
-                recyclerViewAdapter.notifyDataSetChanged();
+//                recyclerViewAdapter.notifyDataSetChanged();
             }
         });
 
@@ -126,15 +126,14 @@ public class UserListFragment extends Fragment {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_SETTLING
-                        && !recyclerViewAdapter.isLoading()  // 不是加载中状态
+                        && !recyclerViewAdapter.isLoading()  // 不是Loading中状态
                         && (lastVisibleItemPosition + 1 == recyclerViewAdapter.getItemCount()    // 已显示到最后一项目，或，显示0个项目
                         || recyclerViewAdapter.getItemCount() == 0)) {
 
                     LogUtil.i("recyclerView", "=======================上拉========================");
 
-                    // 上拉刷新的时候，userList加入null，显示底部Loading项
-                    recyclerViewAdapter.addNullToLast();
-                    recyclerViewAdapter.notifyDataSetChanged();
+                    // 显示底部Loading项
+                    showLoading();
 
                     pageNo = pageNo + 1;  // 上拉刷新的时候，当前页码加1
                     setupRecyclerView(WHAT_USER_LIST_UP_LOADMORE);
@@ -199,18 +198,31 @@ public class UserListFragment extends Fragment {
      */
     private void setupRecyclerView(int what) {
 
-        try {
-            String url = Constant.APP_SERVER_IP
-                    .concat(Constant.APP_ROOT_PATH)
-                    .concat("/json/user/findPageUserList.action");
-            Request<JSONObject> request = NoHttp.createJsonObjectRequest(url, RequestMethod.GET);
-            request.add("pageNo", pageNo);
+        String url = Constant.APP_SERVER_IP
+                .concat(Constant.APP_ROOT_PATH)
+                .concat("/json/user/findPageUserList.action");
+        Request<JSONObject> request = NoHttp.createJsonObjectRequest(url, RequestMethod.GET);
+        request.add("pageNo", pageNo);
 
-            // 发起请求
-            requestQueue.add(what, request, onResponseListener);
+        // 发起请求
+        requestQueue.add(what, request, onResponseListener);
+    }
 
-        } catch (Exception e) {
-            LogUtil.e("error", e.toString());
+    /**
+     * 显示底部Loading项
+     */
+    private void showLoading() {
+        recyclerViewAdapter.addNullToLast();
+        recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount() - 1);
+    }
+
+    /**
+     * 隐藏底部Loading项
+     */
+    private void hideLoading() {
+        if (recyclerViewAdapter.isLoading()) {
+            recyclerViewAdapter.notifyItemRemoved(recyclerViewAdapter.getItemCount() - 1);
+            recyclerViewAdapter.removeNullFromLast();
         }
     }
 
@@ -219,7 +231,6 @@ public class UserListFragment extends Fragment {
      */
     private OnResponseListener<JSONObject> onResponseListener = new OnResponseListener<JSONObject>() {
 
-        @SuppressWarnings("unused")
         @Override
         public void onSucceed(int what, Response<JSONObject> response) {
 
@@ -233,12 +244,11 @@ public class UserListFragment extends Fragment {
                 addToUserList(response);
             } else if (what == WHAT_USER_LIST_UP_LOADMORE) {
 
-                // 上拉刷新的时候，为了显示底部Loading工具条，userList会加入null，此时需要删除null数据
-                recyclerViewAdapter.removeNullFromLast();
+                // 隐藏底部Loading项
+                hideLoading();
 
                 addToUserList(response);
             }
-            recyclerViewAdapter.notifyDataSetChanged();
         }
 
         /**
@@ -252,11 +262,15 @@ public class UserListFragment extends Fragment {
 
                 if (userArray.length() > 0) {
                     recyclerViewAdapter.addUserToList(userArray);
+                    recyclerViewAdapter.notifyItemRangeChanged(recyclerViewAdapter.getItemCount() - userArray.length(), userArray.length());
                 } else {
+                    // 不翻页，保留当前页码
+                    pageNo = pageNo - 1;
+
                     Toast.makeText(getContext(), "没有了。", Toast.LENGTH_SHORT).show();
                 }
             } catch(Exception e) {
-                LogUtil.e("error", "绑定用户列表异常。");
+                Toast.makeText(getContext(), "绑定用户列表异常。", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -268,15 +282,6 @@ public class UserListFragment extends Fragment {
 
         @Override
         public void onFailed(int what, String url, Object tag, Exception e, int resCode, long ms) {
-            // 请求失败
-            String errorMsg = String.valueOf(what).concat(",").concat(url);
-            if (tag != null) {
-                errorMsg = errorMsg.concat(",").concat(tag.toString());
-            }
-            errorMsg = errorMsg.concat(",").concat(e.toString()).concat(",").concat(String.valueOf(resCode));
-            LogUtil.e("onFailed", errorMsg);
-
-            Toast.makeText(getContext(), "加载用户数据失败。", Toast.LENGTH_SHORT).show();
 
             if (what == WHAT_USER_LIST_ONLOAD) {
 
@@ -286,13 +291,14 @@ public class UserListFragment extends Fragment {
                 }
             } else if (what == WHAT_USER_LIST_UP_LOADMORE) {
 
-                // 上拉刷新的时候，为了显示底部Loading工具条，userList会加入null，此时需要删除null数据
-                recyclerViewAdapter.removeNullFromLast();
-                recyclerViewAdapter.notifyDataSetChanged();
+                // 隐藏底部Loading项
+                hideLoading();
             }
 
             // 不翻页，保留当前页码
             pageNo = pageNo - 1;
+
+            Toast.makeText(getContext(), "加载用户数据失败。", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -347,17 +353,17 @@ public class UserListFragment extends Fragment {
                     userViewHolder.sexIconView.setImageBitmap(MyApplication.getGirlIcon());
                 }
 
-                // 加载头像
-                final String headImageSrc = Constant.APP_SERVER_IP
-                        .concat(Constant.RESOURCE_ROOT_PATH)
-                        .concat(user.getHeadImageSrc());
-
-                if (headImageMap.containsKey(headImageSrc)) {
-                    userViewHolder.headImageView.setImageBitmap(headImageMap.get(headImageSrc));
-                    LogUtil.d("headImage", String.valueOf(user.getId()) + "," + headImageSrc);
+                if (headImageMap.containsKey(user.getHeadImageSrc())) {
+                    userViewHolder.headImageView.setImageBitmap(headImageMap.get(user.getHeadImageSrc()));
                 } else {
+
                     // 加载默认头像
-                    userViewHolder.headImageView.setImageResource(R.drawable.default_head_image);
+                    userViewHolder.headImageView.setImageBitmap(MyApplication.getDefaultHeadImage());
+
+                    // 加载头像
+                    String headImageSrc = Constant.APP_SERVER_IP
+                            .concat(Constant.RESOURCE_ROOT_PATH)
+                            .concat(user.getHeadImageSrc());
 
                     Request<Bitmap> imageRequest = NoHttp.createImageRequest(headImageSrc);
                     imageRequest.setCacheMode(CacheMode.NONE_CACHE_REQUEST_NETWORK);
@@ -367,8 +373,7 @@ public class UserListFragment extends Fragment {
                         public void onSucceed(int i, Response<Bitmap> response) {
                             if (response.get() != null) {
                                 userViewHolder.headImageView.setImageBitmap(response.get());
-                                headImageMap.put(headImageSrc, response.get());
-                                LogUtil.d("headImage", String.valueOf(user.getId()) + "," + headImageSrc);
+                                headImageMap.put(user.getHeadImageSrc(), response.get());
                             }
                         }
 

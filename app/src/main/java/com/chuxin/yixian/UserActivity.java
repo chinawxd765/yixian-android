@@ -84,26 +84,20 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
-        requestQueue = NoHttpUtil.newRequestQueue(this.getApplication());
-
         recyclerView = (RecyclerView) findViewById(R.id.user_image_recycler_view);
         recyclerViewAdapter = new RecyclerViewAdapter();
         recyclerView.setAdapter(recyclerViewAdapter);
 
-        try {
-            String url = Constant.APP_SERVER_IP
-                    .concat(Constant.APP_ROOT_PATH)
-                    .concat("/json/user/findUserById.action");
-            Request<JSONObject> request = NoHttp.createJsonObjectRequest(url, RequestMethod.GET);
-            request.add("userId", getIntent().getLongExtra(USER_ID, 0));
+        requestQueue = NoHttpUtil.newRequestQueue(this.getApplication());
 
-            // 发起请求
-            requestQueue.add(WHAT_USER, request, onResponseListener);
+        String url = Constant.APP_SERVER_IP
+                .concat(Constant.APP_ROOT_PATH)
+                .concat("/json/user/findUserById.action");
+        Request<JSONObject> request = NoHttp.createJsonObjectRequest(url, RequestMethod.GET);
+        request.add("userId", getIntent().getLongExtra(USER_ID, 0));
 
-        } catch (Exception e) {
-            LogUtil.e("error", e.toString());
-            finish();
-        }
+        // 发起请求
+        requestQueue.add(WHAT_USER, request, onResponseListener);
     }
 
     /**
@@ -111,7 +105,6 @@ public class UserActivity extends AppCompatActivity {
      */
     private OnResponseListener<JSONObject> onResponseListener = new OnResponseListener<JSONObject>() {
 
-        @SuppressWarnings("unused")
         @Override
         public void onSucceed(int what, Response<JSONObject> response) {
 
@@ -253,8 +246,7 @@ public class UserActivity extends AppCompatActivity {
                         descriptionView.setText(userJsonObject.getString("description"));
                     }
                 } catch(Exception e) {
-                    Toast.makeText(getBaseContext(), "加载用户信息异常。", Toast.LENGTH_SHORT).show();
-                    LogUtil.e("error", "加载用户信息异常。");
+                    Toast.makeText(getBaseContext(), "绑定用户信息异常。", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -268,16 +260,7 @@ public class UserActivity extends AppCompatActivity {
 
         @Override
         public void onFailed(int what, String url, Object tag, Exception e, int resCode, long ms) {
-            // 请求失败
-            String errorMsg = String.valueOf(what).concat(",").concat(url);
-            if (tag != null) {
-                errorMsg = errorMsg.concat(",").concat(tag.toString());
-            }
-            errorMsg = errorMsg.concat(",").concat(e.toString()).concat(",").concat(String.valueOf(resCode));
-            LogUtil.e("onFailed", errorMsg);
-
             Toast.makeText(getBaseContext(), "加载用户信息失败。", Toast.LENGTH_SHORT).show();
-            LogUtil.d("onFailed", "加载用户信息失败。");
             finish();
         }
     };

@@ -18,6 +18,8 @@ public class MyApplication extends Application {
     private static Bitmap boyIcon;
     private static Bitmap girlIcon;
 
+    // 默认头像
+    private static Bitmap defaultHeadImage;
     @Override
     public void onCreate() {
 
@@ -26,6 +28,7 @@ public class MyApplication extends Application {
         Resources resouces = getResources();
         boyIcon = BitmapFactory.decodeResource(resouces, R.drawable.icon_boy);
         girlIcon = BitmapFactory.decodeResource(resouces, R.drawable.icon_girl);
+        defaultHeadImage = BitmapFactory.decodeResource(resouces, R.drawable.default_head_image);
 
     }
 
@@ -35,6 +38,10 @@ public class MyApplication extends Application {
 
     public static Bitmap getGirlIcon() {
         return girlIcon;
+    }
+
+    public static Bitmap getDefaultHeadImage() {
+        return defaultHeadImage;
     }
 
 }
