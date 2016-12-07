@@ -307,8 +307,8 @@ public class UserListFragment extends Fragment {
      */
     private class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private static final int USER_ITEM = 0;  // 用户项
-        private static final int USER_LOADING = 1;  // “加载中”项
+        private static final int USER_ITEM = 1;  // 用户项
+        private static final int USER_LOADING = 2;  // “加载中”项
 
         private List<User> userList = new ArrayList<>();  // 用户列表
 
@@ -358,7 +358,7 @@ public class UserListFragment extends Fragment {
                 } else {
 
                     // 加载默认头像
-                    userViewHolder.headImageView.setImageBitmap(MyApplication.getDefaultHeadImage());
+                    userViewHolder.headImageView.setImageBitmap(MyApplication.getDefaultUserImage());
 
                     // 加载头像
                     String headImageSrc = Constant.APP_SERVER_IP
@@ -455,7 +455,7 @@ public class UserListFragment extends Fragment {
          * @return 当前是否载入中标志
          */
         public boolean isLoading() {
-            return (getItemCount() > 0 && userList.get(getItemCount() - 1) == null);
+            return (getItemCount() > 0 && getItemViewType(getItemCount() - 1) == USER_LOADING);
         }
 
         /**

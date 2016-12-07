@@ -8,7 +8,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -23,6 +22,7 @@ import android.widget.Toast;
 import com.chuxin.yixian.enumType.EducationEnum;
 import com.chuxin.yixian.enumType.IncomeEnum;
 import com.chuxin.yixian.enumType.SexEnum;
+import com.chuxin.yixian.framework.BaseActivity;
 import com.chuxin.yixian.framework.Constant;
 import com.chuxin.yixian.framework.LogUtil;
 import com.chuxin.yixian.framework.MyApplication;
@@ -43,7 +43,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends BaseActivity {
 
     private static final int WHAT_USER = 0;  // 加载用户信息标志
     private static final int WHAT_USER_HEAD_IMAGE = 2;  // 加载用户头像标志
@@ -51,6 +51,9 @@ public class UserActivity extends AppCompatActivity {
 
     // 参数名称
     public static final String USER_ID = "userId";
+
+    // 用户图片位图列表
+    protected static final List<Bitmap> userImageBitmapList = new ArrayList<>();
 
     private RequestQueue requestQueue;
     private RecyclerView recyclerView;
@@ -83,6 +86,8 @@ public class UserActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        userImageBitmapList.clear();
 
         recyclerView = (RecyclerView) findViewById(R.id.user_image_recycler_view);
         recyclerViewAdapter = new RecyclerViewAdapter();
@@ -266,13 +271,13 @@ public class UserActivity extends AppCompatActivity {
     };
 
     @Override
-    public void onStop() {
+    protected void onStop() {
         super.onStop();
         NoHttpUtil.stopRequestQueue(requestQueue);
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         super.onDestroy();
         NoHttpUtil.stopRequestQueue(requestQueue);
     }
@@ -332,7 +337,11 @@ public class UserActivity extends AppCompatActivity {
                     @Override
                     public void onSucceed(int i, Response<Bitmap> response) {
                         if (response.get() != null) {
-                            userImageViewHolder.userImageView.setImageBitmap(response.get());
+                            Bitmap userImageBitmap = response.get();
+                            userImageViewHolder.userImageView.setImageBitmap(userImageBitmap);
+                            userImageBitmapList.add(userImageBitmap);
+                        } else {
+                            userImageBitmapList.add(MyApplication.getDefaultUserImage());
                         }
 
                         // 设置图片高度与宽度相等
@@ -352,8 +361,12 @@ public class UserActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        // TODO
-                        Toast.makeText(getBaseContext(), userImage.getImageSrc(), Toast.LENGTH_LONG).show();
+                        // 转场动画，从当前View拉升到下一个活动
+                        // 在API 21以上生效
+                        ActivityOptionsCompat options =
+                                ActivityOptionsCompat.makeScaleUpAnimation(
+                                        v, v.getWidth() / 2, v.getHeight() / 2, 0, 0);
+                        UserImageActivity.start(v.getContext(), position, options);
                     }
                 });
             }

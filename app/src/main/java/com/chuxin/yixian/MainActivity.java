@@ -6,7 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -46,9 +46,6 @@ public class MainActivity extends BaseActivity
     private ViewPager viewPager;
     private FragmentAdapter fragmentAdapter;
 
-    // ViewPage选项卡页面集合
-    private List<Fragment> fragmentList;
-
     // Tab标题集合
     private List<String> tabTitleList;
 
@@ -68,13 +65,7 @@ public class MainActivity extends BaseActivity
             tabTitleList.add(tabTitles[i]);
         }
 
-        fragmentList = new ArrayList<>();
-        fragmentList.add(MainTabFragment.newInstance(0));
-        fragmentList.add(MainTabFragment.newInstance(1));
-        fragmentList.add(UserListFragment.newInstance());
-        fragmentList.add(MainTabFragment.newInstance(3));
-
-        fragmentAdapter = new FragmentAdapter(getSupportFragmentManager(), fragmentList, tabTitleList);
+        fragmentAdapter = new FragmentAdapter(getSupportFragmentManager(), tabTitleList);
         viewPager.setAdapter(fragmentAdapter);//给ViewPager设置适配器
         tabLayout.setupWithViewPager(viewPager);//将TabLayout和ViewPager关联起来
         tabLayout.setSelectedTabIndicatorHeight(0);  // 设置选中标签下方导航条的高度为0
@@ -158,16 +149,14 @@ public class MainActivity extends BaseActivity
     /**
      * Fragment切换适配器
      */
-    private class FragmentAdapter extends FragmentStatePagerAdapter {
-        private List<Fragment> fragmentList;
+    private class FragmentAdapter extends FragmentPagerAdapter {
         private List<String> titleList;
 
         /**
          * 构造方法
          */
-        public FragmentAdapter(FragmentManager fragmentManager, List<Fragment> fragmentList, List<String> titleList) {
+        public FragmentAdapter(FragmentManager fragmentManager, List<String> titleList) {
             super(fragmentManager);
-            this.fragmentList = fragmentList;
             this.titleList = titleList;
         }
 
@@ -176,15 +165,25 @@ public class MainActivity extends BaseActivity
          */
         @Override
         public int getCount() {
-            return fragmentList.size();
+            return titleList.size();
         }
 
         /**
-         * 返回要显示的Fragment的某个实例
+         * 返回要显示的Fragment
          */
         @Override
         public Fragment getItem(int position) {
-            return fragmentList.get(position);
+            switch (position) {
+                case 0:
+                    return MainTabFragment.newInstance(position);
+                case 1:
+                    return MainTabFragment.newInstance(position);
+                case 2:
+                    return UserListFragment.newInstance();
+                case 3:
+                    return MainTabFragment.newInstance(position);
+            }
+            return null;
         }
 
         /**
@@ -197,15 +196,14 @@ public class MainActivity extends BaseActivity
     }
 
     /**
-     * 实现FindUserListFragment中定义的OnListFragmentInteractionListener接口中的方法
+     * 实现UserListFragment中定义的OnListFragmentInteractionListener接口中的方法
      * @param user 用户
      */
     @Override
     public void onListFragmentInteraction(User user, View view) {
 
-        // TODO
-        // 转场动画，从当前头像拉升到下一个活动
-        // 在android4.4.2下未生效
+        // 转场动画，从当前View拉升到下一个活动
+        // 在API 21以上生效
         ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeScaleUpAnimation(
                         view, view.getWidth() / 2, view.getHeight() / 2, 0, 0);

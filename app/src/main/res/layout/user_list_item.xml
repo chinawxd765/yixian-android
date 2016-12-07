@@ -20,7 +20,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"
         android:contentDescription="@string/user_head_image_description"
-        android:src="@drawable/default_head_image"/>
+        android:src="@drawable/default_user_image"/>
 
     <TextView
         android:id="@+id/nick_name"
